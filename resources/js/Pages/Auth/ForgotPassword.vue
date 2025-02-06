@@ -94,7 +94,11 @@ onMounted(() => {
                 class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur"
               ></span>
               <h2 class="relative text-2xl font-medium tracking-wide text-foreground">
-                Forgot Password?
+                <span class="relative">Forgot</span>
+                <span class="relative ml-2">
+                  <span class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur"></span>
+                  <span class="relative">Password?</span>
+                </span>
               </h2>
             </div>
             <p class="text-sm text-muted-foreground">

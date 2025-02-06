@@ -21,6 +21,9 @@ function toggleTheme() {
 }
 
 function updateTheme() {
+  // Add transition class before changing theme
+  document.documentElement.classList.add('theme-transition');
+  
   // Update root element class
   if (isDark.value) {
     document.documentElement.classList.add("dark");
@@ -30,6 +33,11 @@ function updateTheme() {
 
   // Store preference
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
+  
+  // Remove transition class after animation completes
+  setTimeout(() => {
+    document.documentElement.classList.remove('theme-transition');
+  }, 200);
 }
 </script>
 
@@ -43,3 +51,12 @@ function updateTheme() {
     <span class="sr-only">Toggle theme</span>
   </button>
 </template>
+
+<style>
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: all 0.2s ease-in-out !important;
+}
+</style>

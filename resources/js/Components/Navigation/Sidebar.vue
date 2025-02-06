@@ -50,11 +50,17 @@ import { ref } from "vue";
 
 const isCollapsed = ref(false);
 
-const emit = defineEmits(['update:collapsed']);
+const emit = defineEmits(["update:collapsed"]);
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
-  emit('update:collapsed', isCollapsed.value);
+  emit("update:collapsed", isCollapsed.value);
+};
+
+const page = usePage();
+
+const isActive = (path) => {
+  return page.url.startsWith(path);
 };
 
 const navigationItems = [
@@ -62,50 +68,11 @@ const navigationItems = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    items: [
-      {
-        title: "Overview",
-        href: "/dashboard",
-      },
-      {
-        title: "Analytics",
-        href: "/dashboard/analytics",
-      },
-      {
-        title: "Reports",
-        href: "/dashboard/reports",
-      },
-    ],
   },
   {
     title: "Admin Accounts",
     href: "/admin/users",
     icon: Users,
-    items: [
-      {
-        title: "All Users",
-        href: "/admin/users",
-      },
-      {
-        title: "Add User",
-        href: "/admin/users/create",
-      },
-    ],
-  },
-  {
-    title: "Admin Roles",
-    href: "/admin/roles",
-    icon: Shield,
-    items: [
-      {
-        title: "All Roles",
-        href: "/admin/roles",
-      },
-      {
-        title: "Add Role",
-        href: "/admin/roles/create",
-      },
-    ],
   },
 ];
 
@@ -122,7 +89,7 @@ defineExpose({ isCollapsed });
         { 'w-[80px]': isCollapsed, 'w-[280px]': !isCollapsed },
         '[&_[data-sidebar]]:!w-full [&_[data-sidebar]]:!left-0',
       ]"
-      class="fixed top-0 left-0 h-screen z-20 transition-all duration-200 bg-white dark:bg-gray-900 border-r"
+      class="fixed top-0 left-0 h-screen z-20 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 border-r dark:border-gray-800"
     >
       <SidebarHeader>
         <!-- Top buttons row -->
@@ -132,7 +99,7 @@ defineExpose({ isCollapsed });
           >
             <button
               @click="toggleSidebar"
-              class="text-sidebar-foreground hover:text-primary flex items-center justify-center h-7 w-7"
+              class="text-gray-700 dark:text-gray-200 hover:text-primary flex items-center justify-center h-7 w-7"
             >
               <CollapseIcon
                 class="h-5 w-5 transition-transform duration-200"
@@ -142,6 +109,7 @@ defineExpose({ isCollapsed });
             <ThemeToggle v-if="!isCollapsed" />
           </div>
         </div>
+
         <!-- Logo and title -->
         <SidebarMenu class="mt-2">
           <SidebarMenuItem>
@@ -166,8 +134,12 @@ defineExpose({ isCollapsed });
                   v-if="!isCollapsed"
                   class="grid flex-1 text-left text-sm leading-tight"
                 >
-                  <span class="truncate font-semibold">CoreScore</span>
-                  <span class="truncate text-xs">Admin Panel</span>
+                  <span class="truncate font-semibold text-gray-900 dark:text-white"
+                    >CoreScore</span
+                  >
+                  <span class="truncate text-xs text-gray-600 dark:text-gray-300"
+                    >Admin Panel</span
+                  >
                 </div>
               </div>
             </SidebarMenuButton>
@@ -177,48 +149,46 @@ defineExpose({ isCollapsed });
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel v-if="!isCollapsed" class="px-4"
+          <SidebarGroupLabel
+            v-if="!isCollapsed"
+            class="px-4 text-gray-600 dark:text-gray-400"
             >Navigation</SidebarGroupLabel
           >
           <SidebarMenu>
-            <Collapsible
-              v-for="item in navigationItems"
-              :key="item.title"
-              as-child
-              class="group/collapsible"
-            >
+            <div v-for="item in navigationItems" :key="item.title" class="w-full">
               <SidebarMenuItem>
-                <CollapsibleTrigger as-child>
+                <Link
+                  :href="item.href"
+                  class="w-full"
+                  @click.prevent="$inertia.visit(item.href, { preserveState: true })"
+                >
                   <SidebarMenuButton
-                    :tooltip="isCollapsed ? item.title : ''"
                     :class="{
                       '!justify-center': isCollapsed,
-                      '!justify-start pl-4': !isCollapsed,
+                      '!justify-start pl-[1.15rem]': !isCollapsed,
+                      'bg-primary/10 text-primary sidebar-button active': isActive(
+                        item.href
+                      ),
+                      'sidebar-button': true,
+                      'h-10 w-10 rounded-lg': isCollapsed && isActive(item.href),
+                      'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white': !isActive(
+                        item.href
+                      ),
                     }"
                   >
                     <component
                       :is="item.icon"
-                      :class="{ 'h-5 w-5': isCollapsed, 'h-4 w-4': !isCollapsed }"
+                      class="h-5 w-5 transition-transform duration-300 ease-in-out"
                     />
-                    <span v-if="!isCollapsed" class="ml-3">{{ item.title }}</span>
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent v-if="!isCollapsed">
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem
-                      v-for="subItem in item.items"
-                      :key="subItem.title"
+                    <span
+                      v-if="!isCollapsed"
+                      class="ml-3 transition-opacity duration-300 ease-in-out"
+                      >{{ item.title }}</span
                     >
-                      <Link :href="subItem.href">
-                        <SidebarMenuSubButton as-child class="pl-11">
-                          <span>{{ subItem.title }}</span>
-                        </SidebarMenuSubButton>
-                      </Link>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
-            </Collapsible>
+            </div>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
@@ -245,17 +215,22 @@ defineExpose({ isCollapsed });
                     v-if="!isCollapsed"
                     class="grid flex-1 text-left text-sm leading-tight ml-3"
                   >
-                    <span class="truncate font-semibold">{{ user.name }}</span>
-                    <span class="truncate text-xs">{{ user.email }}</span>
+                    <span class="truncate font-semibold text-gray-900 dark:text-white">{{
+                      user.name
+                    }}</span>
+                    <span class="truncate text-xs text-gray-600 dark:text-gray-300">{{
+                      user.email
+                    }}</span>
                   </div>
                   <ChevronsUpDown v-if="!isCollapsed" class="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                side="top"
-                align="start"
-                :side-offset="4"
+                :align="isCollapsed ? 'end' : 'start'"
+                :side="isCollapsed ? 'right' : 'bottom'"
+                :align-offset="isCollapsed ? -12 : 0"
+                :side-offset="isCollapsed ? 8 : 4"
               >
                 <DropdownMenuLabel class="font-normal">
                   <div class="flex items-center gap-2 p-2">
@@ -265,8 +240,12 @@ defineExpose({ isCollapsed });
                       </AvatarFallback>
                     </Avatar>
                     <div class="grid flex-1 text-left text-sm leading-tight">
-                      <span class="font-medium">{{ user.name }}</span>
-                      <span class="text-xs text-muted-foreground">{{ user.email }}</span>
+                      <span class="font-medium text-gray-900 dark:text-white">{{
+                        user.name
+                      }}</span>
+                      <span class="text-xs text-gray-600 dark:text-gray-300">{{
+                        user.email
+                      }}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
@@ -293,3 +272,66 @@ defineExpose({ isCollapsed });
   </SidebarProvider>
   <slot></slot>
 </template>
+
+<style scoped>
+.nav-item-enter-active,
+.nav-item-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-item-enter-from,
+.nav-item-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.sidebar-button {
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-button:hover {
+  transform: translateX(4px);
+}
+
+.sidebar-button.active {
+  position: relative;
+}
+
+.sidebar-button.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--primary);
+  transform: scaleY(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-button.active::before {
+  transform: scaleY(1);
+}
+
+/* Hide the active indicator line in collapsed mode */
+.\[w-\[80px\]\] .sidebar-button.active::before {
+  display: none;
+}
+
+/* Center the icon in collapsed mode */
+.\[w-\[80px\]\] .sidebar-button {
+  margin: 0 auto;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Smooth transition for content that appears/disappears */
+[v-cloak],
+.v-cloak {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.v-cloak-ready {
+  opacity: 1;
+}
+</style>

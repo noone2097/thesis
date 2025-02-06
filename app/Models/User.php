@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'profile_image',
     ];
 
     /**
@@ -44,4 +46,25 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_admin' => 'boolean',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+    /**
+     * Get the URL for the user's profile photo.
+     */
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        if ($this->profile_image) {
+            return Storage::disk('public')->url($this->profile_image);
+        }
+
+        return '';
+    }
 }

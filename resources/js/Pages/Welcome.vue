@@ -141,16 +141,20 @@ onMounted(() => {
         </div>
 
         <div class="reveal-section opacity-0 max-w-md w-full space-y-8 text-center">
-          <div class="space-y-2">
+          <div class="text-center mb-8">
             <div class="relative inline-block">
               <span
-                class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl"
+                class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur"
               ></span>
-              <h2 class="relative text-2xl font-medium tracking-wide text-foreground">
-                BISU CoreScore
-              </h2>
+              <h1 class="relative text-3xl font-medium tracking-wide text-foreground">
+                <span class="relative">BISU</span>
+                <span class="relative ml-2">
+                  <span class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur"></span>
+                  <span class="relative">CoreScore</span>
+                </span>
+              </h1>
             </div>
-            <p class="text-sm text-muted-foreground">Innovation Through Excellence</p>
+            <p class="mt-2 text-muted-foreground">Innovation Through Excellence</p>
           </div>
 
           <div class="relative">
